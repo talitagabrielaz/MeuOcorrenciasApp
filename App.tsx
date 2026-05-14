@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Toast from 'react-native-toast-message';
 
@@ -16,16 +16,21 @@ import ListaOcorrenciasScreen from './src/screens/ListaOcorrenciasScreen';
 
 import { colors, fontSize } from './src/styles/theme';
 
+
+import { 
+  criarOcorrencia,
+  listarOcorrenciasPorSlug, 
+  SLUG_TALITA
+} from './src/services/api';
+
 export type Ocorrencia = {
-
   id: string;
-
   titulo: string;
-
   descricao: string;
-
   local: string;
-
+  slug?: string;
+  createdAt?: string;
+  updateAt?: string;
 };
 
 export type RootTabParamList = {
@@ -41,21 +46,41 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export default function App() {
-
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([]);
 
-  function adicionarOcorrencia(novaOcorrencia: Omit<Ocorrencia, 'id'>) {
+  //indica o carregamento da API
+  const [carregando, setCarregamento] = useState(false);
 
-    const ocorrenciaCompleta: Ocorrencia = {
+  //carrega a API
+  useEffect(() => {
+    carregarOcorrenciasDaApi();
 
-      id: Date.now().toString(),
+  }, []);
 
-      ...novaOcorrencia,
+  async function carregarOcorrenciasDaApi(){
+    try{
+      setCarregamento(true);
+      const dados = await listarOcorrenciasPorSlug(SLUG_TALITA);
 
-    };
+      setOcorrencias(dados);
 
-    setOcorrencias((valorAtual) => [ocorrenciaCompleta, ...valorAtual]);
+    } catch(error){
+      console.log('Erro ao carregar ocorrencias', error);
+    }finally{
+      setCarregamento(false);
+    }
+  }
 
+  async function adicionarOcorrencia(novaOcorrencia: Omit<Ocorrencia, 'id'>) {
+    const ocorrenciaCriada = await criarOcorrencia({
+        titulo : novaOcorrencia.titulo,
+        descricao : novaOcorrencia.descricao,
+        local : novaOcorrencia.local, 
+        slug  : SLUG_TALITA,
+    });
+
+    //Depois de adicionar, precisa passar o novo valor para a tela
+    setOcorrencias((valorAtual) => [ocorrenciaCriada, ...valorAtual]);
   }
 
   return (
@@ -171,6 +196,7 @@ export default function App() {
               <ListaOcorrenciasScreen
 
                 ocorrencias={ocorrencias}
+                carregando ={carregando}
 
               />
 

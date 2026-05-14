@@ -9,12 +9,11 @@ import { colors, fontSize, spacing } from '../styles/theme';
 import { Ocorrencia } from '../../App';
 
 type Props = {
-
   ocorrencias: Ocorrencia[];
-
+  carregando: boolean;
 };
 
-export default function ListaOcorrenciasScreen({ ocorrencias }: Props) {
+export default function ListaOcorrenciasScreen({ ocorrencias, carregando }: Props) {
 
   return (
 
@@ -28,7 +27,13 @@ export default function ListaOcorrenciasScreen({ ocorrencias }: Props) {
 
       />
 
-      {ocorrencias.length === 0 ? (
+      {carregando ? (
+           <View style={styles.vazioBox}>
+          <Text style={styles.vazioTexto}>
+            Carregando ocorrências....
+          </Text>
+        </View>
+      ) : ocorrencias.length === 0 ? (
 
         <View style={styles.vazioBox}>
 
