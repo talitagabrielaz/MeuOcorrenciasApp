@@ -2,7 +2,7 @@
 const API_URL = 'http://api-ocorrencia.muapps.com.br';
 
 //Slug de identificação aluno
-export const SLUG_TALITA = 'seu_nome';
+export const SLUG_TALITA = 'talita';
 
 /*tipo de dados que irão ser enviados*/
 export type CriarOcorrenciaPayload = {
